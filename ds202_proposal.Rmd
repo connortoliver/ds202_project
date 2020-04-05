@@ -1,0 +1,38 @@
+---
+title: "DS 202 Project Proposal"
+author: "Rushal Sohal, Haley Humphries, Connor Toliver (project coordinator)"
+date: "4/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exploratory Analysis of Secondary Student Alcohol Consumption
+
+### Student Alcohol Consumption Data Set
+https://www.kaggle.com/uciml/student-alcohol-consumption
+
+### Overview
+This data set contains social, gender, familial, grade, alcohol consumption, and other data for secondary students in two Portuguese schools.
+
+The data set is separated into two separate CSVs: one for math courses and one for Portuguese language courses. Of particular relevance to each of these are the `G1`, `G2`, and `G3` columns, which contain the grades for each respective exam for each student.
+
+Each CSV also has 30 other vaariaables, including the school attended, the student's age, sex, address, family size, daily alcohol consumption, weekly alcohol consumption, and more. Additionally, the CSVs contain other important variables which could be beneficial for exploratory analysis, such as number of absences, parental education and job status, quality of family relationships, and more. 
+
+### Exploratory Analysis Plan
+The data set has a lot of room for exploratory analysis. Since the focus of this analysis is on alcohol consumption, we will relate most of the analysis to this.
+
+Some questions we are looking to answer are:
+
+* Does weekly alcohol consumption have an effect on health status, number of absences, or grades?
+
+  * What about weekend alcohol consumption?
+  
+  * Does age or gender have any effect on this as well?
+  
+* Does whether a student has any educational support have an effect on their alcohol consumption?
+
+* What is the quality of family relationships as it relates to weekday and weekend alcohol consumption?
+* Do students who spend more of their free time drinking have an effect on their final grades?
