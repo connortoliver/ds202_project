@@ -1,0 +1,191 @@
+---
+title: "202project"
+Name: Haley Humphries
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+datMat <- read.table("student-mat.csv",sep=",",header=TRUE)
+datPor <- read.table("student-por.csv",sep=",",header=TRUE)
+
+dat <- datMat %>%  inner_join(datPor, by=c("school", "sex", "age", "address", "famsize","Pstatus", "Medu", "Fedu", "Mjob", "Fjob", "reason", "nursery", "internet"), suffix=c(".Mat", ".Por"))
+dat <- dat %>%
+  select('school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', guardian = 'guardian.Mat', traveltime = 'traveltime.Mat', studytime = 'studytime.Mat', failures = 'failures.Mat', schoolsup = 'schoolsup.Mat', famsup = 'famsup.Mat', paid = 'paid.Mat', activities = 'activities.Mat', 'nursery', higher = 'higher.Mat', 'internet', romantic = 'romantic.Mat', famrel = 'famrel.Mat', freetime = 'freetime.Mat', goout = 'goout.Mat', Dalc = 'Dalc.Mat', Walc = 'Walc.Mat', health = 'health.Mat', absences = 'absences.Mat', 'G1.Mat', 'G2.Mat', 'G3.Mat', 'G1.Por', 'G2.Por', 'G3.Por')
+```
+
+```{r}
+students %>% 
+  group_by(Dalc, G1) %>% 
+  arrange(desc(G1))
+```
+Looking at this table I can see that the highest G1 grades were mostly obtained by students who drink very little during the week. (You need to scroll all the way over to see sometimes in these tables, I couldn't figure out how to get rid of the other variables without using summarise and I didn't know what to summarise for. Sorry!)
+
+```{r}
+students %>% 
+  group_by(Dalc, G2) %>% 
+  arrange(desc(G2))
+```
+In this table we get further evidence that lower weekday alcohol consumption has a correlation with grades.
+
+```{r}
+students %>% 
+  group_by(Dalc, G3) %>% 
+  arrange(desc(G3))
+```
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+students %>% 
+  group_by(Dalc) %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average grade`)) + geom_bar(fill="lightpink")
+```
+This chart displays the average grades for students who fall under each of the 5 categories of weekday alcohol consumption. We can see that those who consume little or no alcohol have the highest average grades.
+
+
+```{r}
+students %>% 
+  group_by(Walc) %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+students %>% 
+  group_by(Walc) %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average grade`)) + geom_bar(fill="lightblue")
+```
+This chart displays the average grades for students who fall under each of the 5 categories of weekend alcohol consumption. We can see that those who consume little or no alcohol have the highest average grades with average grade decreasing as weekend alcohol consumption increases.
+```{r}
+students %>% 
+  group_by(Dalc, health) %>%
+  filter(Dalc == '5') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Dalc))
+
+students %>% 
+  group_by(Walc, health) %>%
+  filter(Walc == '5') %>%
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Walc))
+
+students %>% 
+  group_by(Dalc, health) %>%
+  filter(Dalc == '1') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Dalc))
+
+students %>% 
+  group_by(Walc, health) %>%
+  filter(Walc == '1') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Walc))
+```
+We can see that those with very good health tend to drink less than than others. There are a few instances of people who drink fairly often still being in good health but we have to take into account that our data set includes 15-22 year olds, a group of people that is generally pretty healthy. There are also a few cases of people who do not consume much, if any, alcohol having bad health but we also must take into account that some people have pre-existing health conditions. I also wanted to include the average grades for both ends of the spectrum for Walc and Dalc to give us an idea on how well that student does in school based on if they consume much alcohol and I wanted to take account of the average for each level of health. So in the first table we have those who consumed the most alcohol during weekdays, the second table is those who consumed the most alcohol during weekends, the third is those who consume little or no alcohol on weekdays, and the final one is those who consume little or no alcohol on weekends. There is definitely a difference between average grades of those who drink and those who don't.
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  summarise(`Average absences` = mean(absences)) %>% 
+  arrange(desc(`Average absences`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average absences`, fill = rainbow(5))) + geom_bar()
+
+students %>% 
+  group_by(Walc) %>% 
+  summarise(`Average absences` = mean(absences)) %>% 
+  arrange(desc(`Average absences`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average absences`, fill = rainbow(5))) + geom_bar()
+```
+We can see in these two charts that those who consume more alcohol on weekends and weekdays average more absences.
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  filter(sex == 'F') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+students %>% 
+  group_by(Dalc) %>% 
+   filter(sex == 'F') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+```
+This chart displays the average grades of women for each level of weekday alcohol consumption.
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  filter(sex == 'M') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+ students %>% 
+  group_by(Dalc) %>% 
+   filter(sex == 'M') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+```
+This chart displays the average grades of men for each level of weekday alcohol consumption.
+
+```{r}
+students %>% 
+  group_by(Walc) %>% 
+  filter(sex == 'F') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+students %>% 
+  group_by(Walc) %>% 
+   filter(sex == 'F') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+```
+This chart displays the average grades of women for each level of weekend alcohol consumption.
+
+```{r}
+students %>% 
+  group_by(Walc) %>% 
+  filter(sex == 'M ') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`))
+
+students %>% 
+  group_by(Walc) %>% 
+   filter(sex == 'M') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5)), color = Walc) + geom_bar()
+```
+This chart displays the average grades of men for each level of weekend alcohol consumption.
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  summarise(`Average health` = mean(health)) %>% 
+  arrange(desc(`Average health`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average health`, fill = rainbow(5))) + geom_bar()
+
+students %>% 
+  group_by(Walc) %>% 
+  summarise(`Average health` = mean(health)) %>% 
+  arrange(desc(`Average health`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average health`, fill = rainbow(5))) + geom_bar()
+```
+Here we can see the average health of those who consume different levels of alcohol on weekdays and weekends. This does not necessarily show us anything worthwhile because like I addressed earlier, 15-22 year olds are essentially in their prime healthwise while we also have individuals with pre-existing health conditions.
