@@ -1,0 +1,123 @@
+---
+title: "Connor Toliver's Analyses"
+author: "Connor Toliver; @connortoliver"
+date: "4/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+datMat <- read.table("student-mat.csv",sep=",",header=TRUE)
+datPor <- read.table("student-por.csv",sep=",",header=TRUE)
+
+dat <- datMat %>%  inner_join(datPor, by=c("school", "sex", "age", "address", "famsize","Pstatus", "Medu", "Fedu", "Mjob", "Fjob", "reason", "nursery", "internet"), suffix=c(".Mat", ".Por"))
+
+print(nrow(dat)) # 382 students expected according to Kaggle
+```
+
+```{r}
+str(dat)
+```
+
+
+```{r}
+dat <- dat %>% 
+  select('school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', guardian = 'guardian.Mat', traveltime = 'traveltime.Mat', studytime = 'studytime.Mat', failures = 'failures.Mat', schoolsup = 'schoolsup.Mat', famsup = 'famsup.Mat', paid = 'paid.Mat', activities = 'activities.Mat', 'nursery', higher = 'higher.Mat', 'internet', romantic = 'romantic.Mat', famrel = 'famrel.Mat', freetime = 'freetime.Mat', goout = 'goout.Mat', Dalc = 'Dalc.Mat', Walc = 'Walc.Mat', health = 'health.Mat', absences = 'absences.Mat', 'G1.Mat', 'G2.Mat', 'G3.Mat', 'G1.Por', 'G2.Por', 'G3.Por')
+```
+
+
+Does whether a student has any educational support have an effect on their alcohol consumption?
+
+```{r}
+#schoolsup, famsup, Walc, Dalc
+dat$Dalc <- factor(dat$Dalc, levels=c(5, 4, 3, 2, 1))
+dat$Walc <- factor(dat$Walc, levels=c(5, 4, 3, 2, 1))
+
+                   
+dat %>% 
+  ggplot(aes(x=schoolsup, fill=Dalc)) +
+  geom_bar(position='fill') +
+  coord_flip() + 
+  xlab('Extra Educational Support') +
+  ylab('Weekday Alcohol Consumption') +
+  ggtitle('Relationship of Weekday Alcohol Consumption with Extra Educational Support')
+```
+
+```{r}
+dat %>% 
+  ggplot(aes(x=schoolsup, fill=Walc)) +
+  geom_bar(position='fill') +
+  coord_flip() + 
+  xlab('Extra Educational Support') +
+  ylab('Weekend Alcohol Consumption') +
+  ggtitle('Relationship of Weekend Alcohol Consumption with Extra Educational Support')
+```
+
+
+```{r}
+dat %>% 
+  ggplot(aes(x=famsup, fill=Dalc)) +
+  geom_bar(position='fill') +
+  coord_flip() + 
+  xlab('Extra Educational Support') +
+  ylab('Weekday Alcohol Consumption') +
+  ggtitle('Relationship of Weekday Alcohol Consumption with Family Educational Support')
+```
+
+```{r}
+dat %>% 
+  ggplot(aes(x=famsup, fill=Walc)) +
+  geom_bar(position='fill') +
+  coord_flip() + 
+  xlab('Extra Educational Support') +
+  ylab('Weekend Alcohol Consumption') +
+  ggtitle('Relationship of Weekend Alcohol Consumption with Family Educational Support')
+```
+
+
+What is the quality of family relationships as it relates to weekday and weekend alcohol consumption?
+
+```{r}
+dat$famrel <- factor(dat$famrel, levels=c(1, 2, 3, 4, 5))
+
+dat %>% 
+  ggplot(aes(famrel, fill=Dalc)) + 
+  geom_bar(position='fill') +
+  xlab('Family Relationship') +
+  ylab('Weekday Alcohol Consumption') +
+  ggtitle('Family Relationships as Related to Weekday Alcohol Consumption')
+```
+
+
+```{r}
+dat %>% 
+  ggplot(aes(famrel, fill=Walc)) + 
+  geom_bar(position='fill') +
+  xlab('Family Relationship') +
+  ylab('Weekend Alcohol Consumption') +
+  ggtitle('Family Relationships as Related to Weekend Alcohol Consumption')
+```
+
+
+### FAMILY RELATIONSHIPS AND GRADES?
+
+Do students who spend more of their free time drinking have an effect on their final grades? 
+
+```{r}
+dat %>% 
+  ggplot(aes(freetime, G3.Mat, color=Dalc)) + 
+  geom_jitter() + 
+  xlab('Freetime') +
+  ylab('Final Math Score') +
+  ggtitle('How Freetime Affects Final Scores by Weekday Alcohol Consumption')
+```
+
+
