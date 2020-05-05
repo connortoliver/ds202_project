@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Student Alcohol Consumption
 
-Alcohol is a one of the most used drugs in the world by people, and college students are no excception. ManySS people have grown up around it their entire lives and seen the effects first-hand, while others have heard anecdotes about it. Using the Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle, we can analyze several attributes of people's lives in relation to their alcohol consumption to see the effects it has on students. 
+Alcohol is a one of the most used drugs in the world by people, and college students are no excception. Many people have grown up around it their entire lives and seen the effects first-hand, while others have heard anecdotes about it. Using the Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle, we can analyze several attributes of people's lives in relation to their alcohol consumption to see the effects it has on students. 
 
 ## Loading and Prepping the Data
 
@@ -26,6 +26,7 @@ dat <- datMat %>%  inner_join(datPor, by=c("school", "sex", "age", "address", "f
 
 dat <- dat %>% 
   select('school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', guardian = 'guardian.Mat', traveltime = 'traveltime.Mat', studytime = 'studytime.Mat', failures = 'failures.Mat', schoolsup = 'schoolsup.Mat', famsup = 'famsup.Mat', paid = 'paid.Mat', activities = 'activities.Mat', 'nursery', higher = 'higher.Mat', 'internet', romantic = 'romantic.Mat', famrel = 'famrel.Mat', freetime = 'freetime.Mat', goout = 'goout.Mat', Dalc = 'Dalc.Mat', Walc = 'Walc.Mat', health = 'health.Mat', absences = 'absences.Mat', 'G1.Mat', 'G2.Mat', 'G3.Mat', 'G1.Por', 'G2.Por', 'G3.Por')
+
 
 dat$Dalc <- factor(dat$Dalc, levels=c(5, 4, 3, 2, 1))
 dat$Walc <- factor(dat$Walc, levels=c(5, 4, 3, 2, 1))
@@ -118,20 +119,22 @@ Surprisingly, neither alcohol consumption nor freetime had much of an effect at 
 
 Both of these are especially interesting. Growing up, you often hear how bad the effects of alcohol are on grades and schoolwork, but this doesn't point to that at all. That's not to advocate for using/abusing alcohol at all; rather, it's interesting to see how this data doesn't point to those effects.
 
+### Alcohol Consumption, Health, Grades, and Absences
+
 Another question we looked at was what kind of affect, if any at all, weekday alcohol consumption has on health, number of absences, and grades. This displays all levels of health at both ends of the alcohol consumption spectrum (5 being a lot of alcohol consumed and 1 being little or no alcohol consumed, health being really good at 1, and really poor at 5). We are shown that those with very good health tend to drink less than others. There are a few instances of people who drink fairly often still being in good health but we have to take into account that our data set includes 15-22 year olds, a group of people that is generally pretty healthy. There are also a few cases of people who do not consume much, if any, alcohol having bad health but we also must take into account that some people have pre-existing health conditions and the likelyhood of people having alcohol related health issues at this age is very uncommon. Also included in the analysis is if weekend alcohol consumption has an effect on health, number of absences, and grades. It provided pretty similar findings as before. It is also somewhat difficult to work with health when there is not much context. For example, what makes someone a 5? What makes them a 1? Also included are the average grades for both ends of the spectrum for weekly alcohol consumption to give us an idea on how well that student does in school based on if they consume much alcohol and I wanted to take account of the average grade for each level of health. So in the first table we have those who consumed the most alcoholand the second is those who consume little or no alcohol. 
 
 ```{r}
-students %>% 
+dat %>% 
   group_by(Walc, health) %>%
   filter(Walc == '5') %>%
-  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  summarise(`Average grade` = mean(G1.Mat)+mean(G2.Mat)+mean(G3.Mat)) %>% 
   arrange(desc(`Average grade`)) %>% 
   arrange(desc(Walc))
 
-students %>% 
+dat %>% 
   group_by(Walc, health) %>%
   filter(Walc == '1') %>% 
-  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  summarise(`Average grade` = mean(G1.Mat)+mean(G2.Mat)+mean(G3.Mat)) %>% 
   arrange(desc(`Average grade`)) %>% 
   arrange(desc(Walc))
 ```
@@ -141,7 +144,7 @@ There is definitely a difference between average grades of those who drink and t
 Next, I went on to look at average absences at each level of weekday alcohol consumption. It shows pretty much what you would expect. If you are drinking a lot on weekdays, you are probably going to be showing up to fewer classes. 
 
 ```{r}
-students %>% 
+dat %>% 
   group_by(Dalc) %>% 
   summarise(`Average absences` = mean(absences)) %>% 
   arrange(desc(`Average absences`)) %>% 
@@ -150,23 +153,27 @@ students %>%
 
 Then I looked at average grades per level of weekday alcohol consumption. I found that the people with the highest average grades consume a lot less alcohol than those on the bottom of the list. I also found that for weekend alcohol consumption, there are smaller differences between average grades at different levels of alcohol consumptiom, probably because weekends are more easily dedicated to having fun and relaxing without it getting in the way of classes, as opposed to weekdays. 
 
+### Grades by Age and Alcohol Consumption
+
 Finally, I wanted to look at these same variables while also taking into account age and gender. Since the age range in our data set goes from 15-22, I decided the best way to split it up was to look at high schoolers, versus college students. I included ages 15-18 for high school and ages 19-22 for college students. High school students have higher average grades than college students at all levels of alcohol consumption, which is what you might expect since high school is generally much easier than college and there is probably less drinking involved in high school too.
 
 ```{r}
-students %>% 
+dat %>% 
   group_by(Walc) %>% 
    filter(age <= '18') %>% 
-  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  summarise(`Average grade` = mean(G1.Mat)+mean(G2.Mat)+mean(G3.Mat)) %>% 
   arrange(desc(`Average grade`)) %>% 
-  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + ggtitle('Average High School Grades') + geom_bar()
 
- students %>% 
+dat %>% 
   group_by(Walc) %>% 
    filter(age >= '19') %>% 
-  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  summarise(`Average grade` = mean(G1.Mat)+mean(G2.Mat)+mean(G3.Mat)) %>% 
   arrange(desc(`Average grade`)) %>% 
-  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(4))) + ggtitle('Average College Grades') + geom_bar()
 ```
+
+For this project I, Haley Humphries, did the analysis for the last three questions seen in our presentation, created those slides, and wrote the second half of this report about some of my findings in my analysis.
 
 ## Conclusions
 
