@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Student Alcohol Consumption
 
-Alcohol is a one of the most used drugs in the world by people, and college students are no excception. Many people have grown up around it their entire lives and seen the effects first-hand, while others have heard anecdotes about it. Using the Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle, we can analyze several attributes of people's lives in relation to their alcohol consumption to see the effects it has on students. 
+Alcohol is a one of the most used drugs in the world by people, and college students are no excception. ManySS people have grown up around it their entire lives and seen the effects first-hand, while others have heard anecdotes about it. Using the Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle, we can analyze several attributes of people's lives in relation to their alcohol consumption to see the effects it has on students. 
 
 ## Loading and Prepping the Data
 
