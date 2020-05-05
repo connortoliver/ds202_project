@@ -118,6 +118,55 @@ Surprisingly, neither alcohol consumption nor freetime had much of an effect at 
 
 Both of these are especially interesting. Growing up, you often hear how bad the effects of alcohol are on grades and schoolwork, but this doesn't point to that at all. That's not to advocate for using/abusing alcohol at all; rather, it's interesting to see how this data doesn't point to those effects.
 
+Another question we looked at was what kind of affect, if any at all, weekday alcohol consumption has on health, number of absences, and grades. This displays all levels of health at both ends of the alcohol consumption spectrum (5 being a lot of alcohol consumed and 1 being little or no alcohol consumed, health being really good at 1, and really poor at 5). We are shown that those with very good health tend to drink less than others. There are a few instances of people who drink fairly often still being in good health but we have to take into account that our data set includes 15-22 year olds, a group of people that is generally pretty healthy. There are also a few cases of people who do not consume much, if any, alcohol having bad health but we also must take into account that some people have pre-existing health conditions and the likelyhood of people having alcohol related health issues at this age is very uncommon. Also included in the analysis is if weekend alcohol consumption has an effect on health, number of absences, and grades. It provided pretty similar findings as before. It is also somewhat difficult to work with health when there is not much context. For example, what makes someone a 5? What makes them a 1? Also included are the average grades for both ends of the spectrum for weekly alcohol consumption to give us an idea on how well that student does in school based on if they consume much alcohol and I wanted to take account of the average grade for each level of health. So in the first table we have those who consumed the most alcoholand the second is those who consume little or no alcohol. 
+
+```{r}
+students %>% 
+  group_by(Walc, health) %>%
+  filter(Walc == '5') %>%
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Walc))
+
+students %>% 
+  group_by(Walc, health) %>%
+  filter(Walc == '1') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  arrange(desc(Walc))
+```
+
+There is definitely a difference between average grades of those who drink and those who don't. However it is not as much of a difference as some might expect, including myself. This could be because those who are consuming a good amount of alcohol can still be responsible for their school work and prioritize. Alcohol consumption also has a bigger effect on health as you get older, not when you are practically in your prime. 
+
+Next, I went on to look at average absences at each level of weekday alcohol consumption. It shows pretty much what you would expect. If you are drinking a lot on weekdays, you are probably going to be showing up to fewer classes. 
+
+```{r}
+students %>% 
+  group_by(Dalc) %>% 
+  summarise(`Average absences` = mean(absences)) %>% 
+  arrange(desc(`Average absences`)) %>% 
+  ggplot(aes(x= Dalc, weight = `Average absences`, fill = rainbow(5))) + ggtitle('Average Absences per Level of Weekday Alcohol Consumption') + geom_bar()
+```
+
+Then I looked at average grades per level of weekday alcohol consumption. I found that the people with the highest average grades consume a lot less alcohol than those on the bottom of the list. I also found that for weekend alcohol consumption, there are smaller differences between average grades at different levels of alcohol consumptiom, probably because weekends are more easily dedicated to having fun and relaxing without it getting in the way of classes, as opposed to weekdays. 
+
+Finally, I wanted to look at these same variables while also taking into account age and gender. Since the age range in our data set goes from 15-22, I decided the best way to split it up was to look at high schoolers, versus college students. I included ages 15-18 for high school and ages 19-22 for college students. High school students have higher average grades than college students at all levels of alcohol consumption, which is what you might expect since high school is generally much easier than college and there is probably less drinking involved in high school too.
+
+```{r}
+students %>% 
+  group_by(Walc) %>% 
+   filter(age <= '18') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+
+ students %>% 
+  group_by(Walc) %>% 
+   filter(age >= '19') %>% 
+  summarise(`Average grade` = mean(G1)+mean(G2)+mean(G3)) %>% 
+  arrange(desc(`Average grade`)) %>% 
+  ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(5))) + geom_bar()
+```
 
 ## Conclusions
 
@@ -128,6 +177,10 @@ We reached a few interesting conclusions during this exploratory analysis of stu
 * Students consume more alcohol the worse their family relationship is
 
 * Neither freetime nor weekday alcohol consumption have a significant effect on final scores
+
+* Students who consume less alcohol on weekends and weekdays generally have better grades, better health and fewer absences
+
+* College students tend to let alcohol affect their grades more than high schoolers
 
 
 ## Sources
