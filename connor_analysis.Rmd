@@ -120,4 +120,12 @@ dat %>%
   ggtitle('How Freetime Affects Final Scores by Weekday Alcohol Consumption')
 ```
 
+```{r}
+dat %>% 
+  ggplot(aes(freetime, G3.Por, color=Dalc)) + 
+  geom_jitter() + 
+  xlab('Freetime') +
+  ylab('Final Math Score') +
+  ggtitle('How Freetime Affects Final Scores by Weekday Alcohol Consumption')
+```
 

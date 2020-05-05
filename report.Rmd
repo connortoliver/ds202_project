@@ -1,0 +1,135 @@
+---
+title: "Exploring the Effects of Student Alcohol Consumption"
+author: "Connor Toliver and Haley Humphries; GitHub: @connortoliver and @haley22"
+date: "5/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Student Alcohol Consumption
+
+Alcohol is a one of the most used drugs in the world by people, and college students are no excception. Many people have grown up around it their entire lives and seen the effects first-hand, while others have heard anecdotes about it. Using the Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle, we can analyze several attributes of people's lives in relation to their alcohol consumption to see the effects it has on students. 
+
+## Loading and Prepping the Data
+
+Before we begin, let's first quickly load in the data and prep it. This means joining our tables, selecting the variables we'll use, and factoring some of the variables.
+
+```{r}
+library(tidyverse)
+datMat <- read.table("student-mat.csv",sep=",",header=TRUE)
+datPor <- read.table("student-por.csv",sep=",",header=TRUE)
+
+dat <- datMat %>%  inner_join(datPor, by=c("school", "sex", "age", "address", "famsize","Pstatus", "Medu", "Fedu", "Mjob", "Fjob", "reason", "nursery", "internet"), suffix=c(".Mat", ".Por"))
+
+dat <- dat %>% 
+  select('school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', guardian = 'guardian.Mat', traveltime = 'traveltime.Mat', studytime = 'studytime.Mat', failures = 'failures.Mat', schoolsup = 'schoolsup.Mat', famsup = 'famsup.Mat', paid = 'paid.Mat', activities = 'activities.Mat', 'nursery', higher = 'higher.Mat', 'internet', romantic = 'romantic.Mat', famrel = 'famrel.Mat', freetime = 'freetime.Mat', goout = 'goout.Mat', Dalc = 'Dalc.Mat', Walc = 'Walc.Mat', health = 'health.Mat', absences = 'absences.Mat', 'G1.Mat', 'G2.Mat', 'G3.Mat', 'G1.Por', 'G2.Por', 'G3.Por')
+
+dat$Dalc <- factor(dat$Dalc, levels=c(5, 4, 3, 2, 1))
+dat$Walc <- factor(dat$Walc, levels=c(5, 4, 3, 2, 1))
+dat$famrel <- factor(dat$famrel, levels=c(1, 2, 3, 4, 5))
+```
+
+## Exploring the Data
+
+Now that we have the data loaded and ready to go, let's look at what the data tells us. Initially, we had a few questions we tried to answer:
+
+* Does whether a student has any educational support have an effect on their alcohol consumption?
+
+* What is the quality of family relationships as it relates to alcohol consumption?
+
+* Do students who spend more of their free time drinking have an effect on their final grades?
+
+* Does weekly alcohol consumption have an effect on health status, number of absences, or grades?
+
+  * What about weekend alcohol consumption?
+  
+  * Does age or gender have any effect on this as well?
+  
+### Alcohol consumption & educational support
+
+Much of the data set has variables based on a 1-5 scale. For example, weekday and weekend alcohol consumption are rated on a 1-5 scale; 1 meaning little to no alcohol, and 5 meaning a very high intake of alcohol.
+
+We thought it would be interesing to look at the relationship between alcohol consumption and educational support. Our hypothesis was that students with more educational support would have higher amounts of of alcohol consumption than those who don't, because students who receive more educational support have more time and ability to drink more. While weekday drinking was slightly higher for students with educational support, weekend drinking was a surprise.
+
+```{r}
+dat %>% 
+  ggplot(aes(x=schoolsup, fill=Walc)) +
+  geom_bar(position='fill') +
+  coord_flip() + 
+  xlab('Extra Educational Support') +
+  ylab('Weekend Alcohol Consumption') +
+  ggtitle('Relationship of Weekend Alcohol Consumption with Extra Educational Support')
+```
+
+Students who received educational support actually had a higher percentage of students who drank little to no alcohol than students who received no educational support. In fact, the percentage of students who ranked their alcohol consumption as "5" was lower compared to students who received no educational support. Perhaps certain educational support such as weekend tutoring is the cause of this, since students are more focused on their education on the weekends than those who do not receive support.
+
+### Alcohol consumption & family relationships 
+
+Next, we wanted to look at alcohol consumption and how they relate to family relationships. We hypothesized that the higher the alcohol consumption, the higher the percentage of people who had lower quality familiy relationships. The results are clear and come as no surprise:
+
+```{r}
+dat %>% 
+  ggplot(aes(famrel, fill=Dalc)) + 
+  geom_bar(position='fill') +
+  xlab('Family Relationship') +
+  ylab('Weekday Alcohol Consumption') +
+  ggtitle('Family Relationships as Related to Weekday Alcohol Consumption')
+```
+
+As you can see, students who rated their family relationships as lower quality saw a larger percentage of weekday high alcohol consumption. However, when compared to weekend alcohol consumption, the results are even more clear:
+
+```{r}
+dat %>% 
+  ggplot(aes(famrel, fill=Walc)) + 
+  geom_bar(position='fill') +
+  xlab('Family Relationship') +
+  ylab('Weekend Alcohol Consumption') +
+  ggtitle('Family Relationships as Related to Weekend Alcohol Consumption')
+```
+
+Nearly 25% of respondents with a family relationship of 1 had a very high weekend alcohol consumption of 5. As the relationship gets better, the percentage of high amounts of alcohol consumption clearly decreases. This tells us that students who drink more have worse family relationships, which fits with our initial hypothesis.
+
+### Alcohol consumption, freetime, & finals
+
+Final grades are an often dreaded part of any semester, but what effect does it have on grades? And does freetime have any effect either? We hypothesized that students who drink more -- especially those who rate their alcohol consumption at a 4 or 5 -- will have worse final grades, and that students with more free time will have higher grades.
+
+```{r}
+dat %>% 
+  ggplot(aes(freetime, G3.Mat, color=Dalc)) + 
+  geom_jitter() + 
+  xlab('Freetime') +
+  ylab('Final Math Score') +
+  ggtitle('How Freetime Affects Math Final Scores by Weekday Alcohol Consumption')
+```
+
+```{r}
+dat %>% 
+  ggplot(aes(freetime, G3.Por, color=Dalc)) + 
+  geom_jitter() + 
+  xlab('Freetime') +
+  ylab('Final Math Score') +
+  ggtitle('How Freetime Affects Portuguese Final Scores by Weekday Alcohol Consumption')
+```
+
+Surprisingly, neither alcohol consumption nor freetime had much of an effect at all. Students with high alcohol consumptions didn't stray far from the middle range of grades around 7.5 to 12.5, but there are no real discernible correlations, and the same goes for freetime. 
+
+Both of these are especially interesting. Growing up, you often hear how bad the effects of alcohol are on grades and schoolwork, but this doesn't point to that at all. That's not to advocate for using/abusing alcohol at all; rather, it's interesting to see how this data doesn't point to those effects.
+
+
+## Conclusions
+
+We reached a few interesting conclusions during this exploratory analysis of student alcohol consumption.
+
+* Students who receive extra educational support appear to drink less during weekends but tone it back on the weekends comparatively
+
+* Students consume more alcohol the worse their family relationship is
+
+* Neither freetime nor weekday alcohol consumption have a significant effect on final scores
+
+
+## Sources
+
+[The Student Alcohol Consumption data set from University of California-Irvine Machine Learning on Kaggle](https://www.kaggle.com/uciml/student-alcohol-consumption)
