@@ -173,6 +173,14 @@ dat %>%
   ggplot(aes(x= Walc, weight = `Average grade`, fill = rainbow(4))) + ggtitle('Average College Grades') + geom_bar()
 ```
 
+## Contributions
+
+### Connor Toliver
+
+For this project, I handled the analysis for the first three questions raised in the report and presentation. I was also the project coordinator and handled recording and uploading the presentation, the GitHub repository, and communications with the instructor and TA.
+
+### Haley Humphries
+
 For this project I, Haley Humphries, did the analysis for the last three questions seen in our presentation, created those slides, and wrote the second half of this report about some of my findings in my analysis.
 
 ## Conclusions
